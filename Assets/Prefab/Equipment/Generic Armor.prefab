@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1954855116700092
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5918000894713991141}
+  - component: {fileID: 4819143184021623880}
+  m_Layer: 0
+  m_Name: Generic Armor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5918000894713991141
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954855116700092}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 949.5417, y: 523.10956, z: -238.74225}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4819143184021623880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954855116700092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5218485c1b26f194fbca729c33ac5399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 1
+  AssociatedCards:
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}
+  - {fileID: 7052566264562865556, guid: 6bc305aad1b0d7d46a012e5eeb00ff91, type: 3}

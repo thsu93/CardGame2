@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2326382148432136367
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6918882277801884876}
+  - component: {fileID: 8993378967516694339}
+  m_Layer: 0
+  m_Name: Generic Sword
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6918882277801884876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2326382148432136367}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 949.5417, y: 523.10956, z: -238.74225}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8993378967516694339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2326382148432136367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5218485c1b26f194fbca729c33ac5399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 4
+  AssociatedCards:
+  - {fileID: 7178531303337053122, guid: b2527a66e9644444a87eff4c60ca46d8, type: 3}
+  - {fileID: 7178531303337053122, guid: b2527a66e9644444a87eff4c60ca46d8, type: 3}
+  - {fileID: 3057516184619689206, guid: cd59a09916ad3c647b26be1bc1f6d447, type: 3}
+  - {fileID: 3057516184619689206, guid: cd59a09916ad3c647b26be1bc1f6d447, type: 3}
+  - {fileID: 610851122863235635, guid: de97e6b5ade5973429749dd0a8da0f3d, type: 3}
+  - {fileID: 610851122863235635, guid: de97e6b5ade5973429749dd0a8da0f3d, type: 3}
+  - {fileID: 8548194012530906164, guid: 4d350168d7fdd2643af3cf3936f30865, type: 3}
+  - {fileID: 8548194012530906164, guid: 4d350168d7fdd2643af3cf3936f30865, type: 3}
+  - {fileID: 1029552517122126899, guid: 71ae7aed3d665a0438e35d3b9f0362c4, type: 3}
+  - {fileID: 1029552517122126899, guid: 71ae7aed3d665a0438e35d3b9f0362c4, type: 3}
+  - {fileID: 610851122863235635, guid: de97e6b5ade5973429749dd0a8da0f3d, type: 3}
