@@ -1,214 +1,294 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 
-//Manage in-game logic. 
-
-//To Do:
-//? of how to add edit phase
+/// <summary>
+/// Handles the logic of the game
+/// </summary>
 
 public class GameManager : MonoBehaviour
 {
+    //Referenced gameobjects
     public PlayHandler playZone;
     public HandHandler hand;
     public DeckDisplay playerDeckDisplay;
     public UIController UI;
     public BurnHandler burner;
+    public ComboManager combo;
+    BattleManager battle;
+
+    //characters in the battle.
+    //TODO: will require rework if more than one enemy/player char
     public Character player;
     public Character enemy;
-    public ComboManager enemyCombo;
-    int turnCount = 1;
-    int PlayerHP;
-    int PlayerMaxHP;
-    int EnemyHP;
-    int EnemyMaxHP;
-    int damage;
-    int attack;
-    int heal;
-    bool isActive = true;
-    bool wasBurned = false;
-    //NEED TO INCORPORATE OF THE GAME LOGIC, SHOULD BE IN HERE
 
+    //holders for aspects of player and enemy, derived from respective character 
+    CharacterStats playerStats;
+    CharacterStats enemyStats;
+    Deck playerDeck;
+    Deck enemyDeck;
+
+    //helper classes, holders for card effects
+    Card currentPlayerCard;
+    CardAction currentPlayerAction;
+    Card currentEnemyCard;
+
+    //variables for game logic
+    int turnCount = 1;
+
+
+    /// <summary>
+    /// initialize game.
+    /// </summary>
     private void Start() 
     {
+        battle = this.gameObject.AddComponent<BattleManager>();
+        playerDeck = this.gameObject.AddComponent<Deck>();
+        enemyDeck = this.gameObject.AddComponent<Deck>();
+
+        playerStats = player.stats;
+        enemyStats = enemy.stats;
+
+        UI.SetChar(playerStats, 0);
+        UI.SetChar(enemyStats, 1);
+
+        playerDeck.initialize(player.decklist);
+        enemyDeck.initialize(enemy.decklist);
+
         StartGame();
     }
 
+
+    /// <summary>
+    /// Initialize the game state
+    /// 
+    /// Currently just deals out a full hand
+    /// 
+    /// DESIGN Q: Additional complexity?
+    /// </summary>
     void StartGame()
     {
-        PlayerMaxHP = player.maxHP;
-        PlayerHP = PlayerMaxHP;
-        UI.setMaxHP(PlayerMaxHP, 0);
-        UI.setHP(PlayerHP, 0);
-        UI.playerHealth.setName(player.charName, Color.green);
-
-        EnemyMaxHP = enemy.maxHP;
-        EnemyHP = EnemyMaxHP;
-        UI.setMaxHP(EnemyMaxHP, 1);
-        UI.setHP(EnemyHP, 1);
-        UI.enemyHealth.setName(enemy.charName, Color.red);
-
-        playerDeckDisplay.InitializeDeck(player);
-        playerDeckDisplay.b.interactable = true;
-        
-
-
-    }
-
-    private void Update()
-    {
-        setMode(isActive);
-    }
-
-    //Called when card is dropped into a play dropzone, calculates damage/defense values against existing player/opponent health
-    //Updates player health, enemy health
-    //Locks out until re-activated from elsewhere.  
-    public void ExecuteTurn(CardEffect playerCard)
-    {
-
-        if (playerCard.isBurnEffect)
+        //Current deck for both players to full decklist
+        //Char stats to default values
+        //fill hand to full
+        for (int i = 0; i < hand.getMax(); i++)
         {
-            wasBurned = true;
+            Card a = playerDeck.GenerateNewCard();
+            playerDeckDisplay.Deal(a);
+        }
+        
+        UI.SetTurn(turnCount);
+        setDropMode(true);
+
+        //etc. etc.
+    }
+
+    /// <summary>
+    /// Checks every frame if drop zone has a card object
+    /// </summary>
+    private void Update() {
+
+        //if playzone has a card, execute turn loop
+        if (playZone.hasCard)
+        {
+            PreExecute();
+            ExecuteTurn();
+            CleanUp();
         }
 
-        //obv need better AI
-        //likely need a way to incorporate
-        Card enemyCard = enemy.GenerateNewCard();
+    }
 
-        BattleCalculations(playerCard, enemyCard.playEffect);
 
+    ///
+    /// TURN LOOP:
+    /// 
+    /// DRAW
+    /// WAIT FOR PLAYER TO DROP
+    /// PRE-EXECUTE
+    /// EXECUTE
+    /// CLEAN-UP
+    /// 
+    /// 
+    /// 
+    // DRAW
+    // Check for any draw/action manipulation
+    // If manipulated, check (kinds of manipulation?)
+    // Add card to hand
+    /// <summary>
+    /// Handles the drawing of cards.
+    /// 
+    /// Has Deck generate the top card, deactivate draw button, activate dropzones, and moves card to player hand.
+    /// 
+    /// TODO: work in draw manipulation
+    /// </summary>
+    public void DrawStep()
+    {
+        //Should be able to possibly change the top card
+        //some sort of draw manipulation func
+
+        //generate an instance of the top card
+        currentPlayerCard = playerDeck.GenerateNewCard();
+
+        setDropMode(true);
+        playerDeckDisplay.setActive(false);
+
+        //pass to deckdisplay for dealing
+        playerDeckDisplay.Deal(currentPlayerCard);
+    }
+
+
+    /// PRE-EXECUTE
+    /// Called when card is dropped into a play dropzone
+    /// Calculate DOTs, checks gamestate
+    /// Check for any combos, calculates damage/defense values against existing player/opponent health
+    /// Calculate damage (check for any status modifiers)
+    /// <summary>
+    /// Determines how turn will proceed. Checks for combos, runs enemy AI, calculates damage values.
+    /// 
+    /// Current Execution order:
+    /// DOTs,
+    /// Combo Check,
+    /// Determine Card Action,
+    /// Pass to execution.
+    /// 
+    /// TODO: play vs burn
+    /// TODO: manager for DOT effects
+    /// TODO: enemy AI
+    /// </summary>
+    void PreExecute()
+    {
+        //DOTs take effect
+        GameStateCheck();
+        
+
+        //take the card effect and set to current card effect
+        currentPlayerCard = playZone.GetCard();
+
+        //pass newCard to combomanager for processing
+        combo.addToQueue(currentPlayerCard, playerDeck);
+        currentPlayerCard = combo.getAction();
+
+        //AI generate enemy card
+        currentEnemyCard = enemyDeck.GenerateNewCard();
+
+        //TODO: placeholder, needs to deal with if burn
+        currentPlayerAction = currentPlayerCard.play;
+
+        //add card to GY or burn;
+        // isActive = false;
+
+        //Set enemy AI card to card action. Currently just always using play effect
+    }
+
+
+    /// EXECUTE
+    /// <summary>
+    /// Handles applying damage, playing animations/locking out players during animation
+    /// 
+    /// TODO: implement lockouts, animations after finishing core loop
+    /// </summary>
+    public void ExecuteTurn()
+    {
+        //should probably just pass all effects
+        battle.BattleCalculations(currentPlayerAction, playerStats, currentEnemyCard.play, enemyStats);
+
+
+        //StartCoroutine(Lockout(.5f));
+    }
+    
+    // CLEAN-UP
+    // Check gamestate 
+    // Enable start of next turn
+    /// <summary>
+    /// Function to process post-turn.
+    /// 
+    /// Moves cards to appropriate post-turn locations.
+    /// 
+    /// Checks gamestate for player/enemy death
+    /// 
+    /// If not endstate, update values/reset variables and wait for next turn to begin
+    /// </summary>
+    void CleanUp()
+    {
+        //TODO: CURRENT ERROR: ENEMY DOES NOT REGEN CARDS
+        //CARDS ARE NOT ADDED TO ENEMY'S GY
+        
+        //TODO: handle adding to burn vs graveyard
+        playerDeck.AddToGraveyard(currentPlayerCard);
+        enemyDeck.AddToGraveyard(currentEnemyCard);
+        
         GameStateCheck();
 
-        UI.setHP(PlayerHP, 0);
-        UI.setHP(EnemyHP, 1);
-        isActive = false;
-        StartCoroutine(Lockout());
-    }
+        //Re-activate draw button, turn off drop zones.
+        playerDeckDisplay.setActive(true);
+        setDropMode(false);
 
-    IEnumerator Lockout()
-    {
-        yield return new WaitForSeconds(1.0f);
-        NewTurn();
-        isActive = true;
+        //Update turn counter.
+        turnCount++;
+        UI.SetTurn(turnCount);
     }
 
 
-    //Will likely have to split this into its own class later;
-    //Especially with non-random enemy AI
-    //Leave in for now
-    void BattleCalculations(CardEffect p1, CardEffect p2)
-    {
-        int playerDamageTaken = p2.damageVal - p1.defenseVal - p1.healVal;
-        int enemyDamageTaken = p1.damageVal - p2.defenseVal - p1.healVal;
-        int playerBlock = p1.defenseVal;
-        int enemyBlock = p2.defenseVal;
-        int playerHeal = p1.healVal;
-        int enemyHeal = p2.healVal;
-
-        if (p1.defenseVal > p2.damageVal)
-        {
-            playerBlock = p2.damageVal;
-        }
-        if (p2.defenseVal > p1.damageVal)
-        {
-            enemyBlock = p1.damageVal;
-        }
-
-        if (playerDamageTaken < 0)
-        {
-            playerDamageTaken = 0;
-        }
-        
-        if (enemyDamageTaken < 0)
-        {
-            enemyDamageTaken = 0;
-        }
-
-        if (PlayerHP+p1.healVal > player.maxHP)
-        {
-            playerHeal = PlayerMaxHP-PlayerHP;
-        }
-        if (EnemyHP+p2.healVal > enemy.maxHP)
-        {
-            enemyHeal = EnemyMaxHP-EnemyHP;
-        }
-
-        UI.playerDamageDisplay.displayDamage(playerDamageTaken, playerBlock, playerHeal);
-        UI.enemyDamageDisplay.displayDamage(enemyDamageTaken, enemyBlock, enemyHeal);
-
-        PlayerHP -= playerDamageTaken;
-        EnemyHP -= enemyDamageTaken;
-    }
-
+    // CHECK GAMESTATE
+    // If a char health is = 0, character dies
+    // Check for game over/win states given char health
+    /// <summary>
+    /// Checks if a character has died. Player death evaluated first.
+    /// 
+    /// TODO: Will eventually add more complexity to win/loss states
+    /// </summary>
     void GameStateCheck()
     {
-        if (PlayerHP>PlayerMaxHP)
+        if (playerStats.currentHP == 0)
         {
-            PlayerHP = PlayerMaxHP;
-        }
-
-        if (PlayerHP <= 0)
-        {
-            PlayerHP = 0;
             GameOver();
         }
-        else if (EnemyHP <= 0)
+        else if (enemyStats.currentHP <= 0)
         {
-            EnemyHP = 0;
             GameWin();
         }
     }
-
-    void setMode(bool on)
-    {
-        playZone.setMode(on);   
-        burner.setMode(on);
-    }
-
-    // CardEffect enemyTurn()
-    // {
-    //     Card randCard = ;
-    // }
-
-    //Called when new hand is dealt
-    //Queuehandler: Emptys queue, resets all queue values to defaults
-    //Hand: re-fills hand
-    public void NewTurn()
-    {
-        //this should probably be relegated to its own button
-        if (turnCount == 0)
-        {
-            StartGame();
-        }
-        else 
-        {
-            if (wasBurned)
-            {
-                wasBurned = false;
-            }
-            else
-            {
-                playerDeckDisplay.Deal(player.GenerateNewCard());
-            }
-        }
-        turnCount++;
-        UI.ChangeTurn(turnCount);
-        isActive = true;
-    }
-    
-    //if queue is full, create execute button at some location (currently temp)
-    //should this be in queuehandler!?
     void GameOver()
     {
         UI.GameOver();
         turnCount = 0;
         hand.Reset();
     }
-
     void GameWin()
     {
         UI.GameWin();
         turnCount = 0;
         hand.Reset();
     }
+
+
+
+
+    /// <summary>
+    /// Prevent player actions while animations play
+    /// 
+    /// TODO: re-evaluate code once animations made
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    IEnumerator Lockout(float time)
+    {
+        yield return new WaitForSeconds(time);
+        //TODO: SOME ANIMATION TO REPRESENT LOCKOUT
+
+        //PROG Q: should be in an animation manager?
+    }
+
+
+    /// <summary>
+    /// Function to activate/inactivate drop-zones
+    /// </summary>
+    /// <param name="on">true if on, false if off</param>
+    void setDropMode(bool on)
+    {
+        playZone.setMode(on);   
+        burner.setMode(on);
+    }
+
 }
