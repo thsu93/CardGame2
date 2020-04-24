@@ -14,17 +14,17 @@ public class Character : MonoBehaviour
     /// 
     /// TODO: Likely should switch to list of cardID strings, depending on Deck
     /// </summary>
-    public List<Card> decklist;
+    public List<string> decklist;
     
     public CharacterStats stats;
 
     private void Awake() {
-        decklist = new List<Card>();
+        decklist = new List<string>();
         foreach (Equipment equip in equips)
         {
             foreach (Card tempCard in equip.AssociatedCards)
             {
-                decklist.Add(tempCard);
+                decklist.Add(tempCard.cardID);
             }
         }
     }

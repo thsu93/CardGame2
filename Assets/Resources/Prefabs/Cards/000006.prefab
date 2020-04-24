@@ -38,6 +38,11 @@ PrefabInstance:
       propertyPath: cardName
       value: Spell
       objectReference: {fileID: 0}
+    - target: {fileID: 402947192249320840, guid: a1786570a2dff73438fcd1bf4a570d0d,
+        type: 3}
+      propertyPath: cardID
+      value: 000006
+      objectReference: {fileID: 0}
     - target: {fileID: 402947192249320841, guid: a1786570a2dff73438fcd1bf4a570d0d,
         type: 3}
       propertyPath: m_Color.r

@@ -10,40 +10,26 @@ using UnityEngine;
 /// </summary>
 public class ComboManager : MonoBehaviour
 {
-    static int COMBOLENGTH = 3;
-
     Card currentAction = null;
 
-    //some sort of dict to check against;
-    //if combo is in dict, 
-    /*
-    public CardAction comboCheck(Card card)
+    CardLoader loader;
+
+    private void Start() 
     {
-        check cardname + two prev card names
-        if in dict, return matching card effect
-        else 
-        return card.playEffect;
+        loader = ScriptableObject.CreateInstance<CardLoader>();
     }
-    */
-    //TODO: More streamlined combo check functions
 
     /// <summary>
-    /// 
+    /// Adds the given card to queue.
     /// </summary>
     /// <param name="card"></param>
     /// <param name="deck"></param>
-    public void addToQueue(Card card, Deck deck)
+    public void addToQueue(Card card)
     {
         if (card != null)
         {
             card.transform.SetParent(this.transform);
             currentAction = card;
-            if (this.transform.childCount > COMBOLENGTH)
-            {
-            //TODO: Convert to handling w/ cardIDs.
-                deck.AddToGraveyard(this.transform.GetChild(0).GetComponent<Card>());
-                Destroy(this.transform.GetChild(0));
-            }
         }
         
     }
@@ -57,8 +43,31 @@ public class ComboManager : MonoBehaviour
             cardIDs += curr.cardID;
         }
         //TODO: FIX THIS
-        //return comboDict.GetComboCard(cardIDs);
-        //placeholder
-        return currentAction;
+        if (loader.exists(cardIDs))
+        {
+            Debug.Log("Combo");
+            return loader.InstantiateCard(cardIDs);
+        }
+        else
+            return currentAction;
+    }
+
+    /// <summary>
+    /// Gets the first card in the combo queue
+    /// 
+    /// Currently used to clear in the clean-up phase 
+    /// </summary>
+    /// <returns>first child of combo queue</returns>
+    public Card getFirst()
+    {
+        return this.transform.GetChild(0).GetComponent<Card>();
+    }
+
+    public void Reset()
+    {
+        foreach (Transform child in this.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }

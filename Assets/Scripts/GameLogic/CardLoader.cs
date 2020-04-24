@@ -5,7 +5,10 @@ using UnityEngine;
 /// <summary>
 /// Intended to deal with creating, manipulating card datums given cardIDs without requiring pre-existing gameobjects
 /// 
-/// TODO: XML language to match full database
+/// Currently also handles checking if a card exists. Should this be forked off to a different class?
+/// 
+/// TODO: Decide where to check if card exists. 
+/// TODO: XML language to match full database?
 /// </summary>
 public class CardLoader : ScriptableObject
 {
@@ -14,14 +17,14 @@ public class CardLoader : ScriptableObject
     /// <summary>
     /// Generates a card gameobject from a given cardID, given it exists within the card resources folder.
     /// 
-    /// PROG Q: what to do re:errors
+    /// PROG Q: what to do re:errors. Currently does not handle, assumes good input.
     /// </summary>
     /// <param name="cardID"></param>
     /// <returns></returns>
     public Card InstantiateCard(string cardID)
     {
-        Card tempCard = Instantiate((Card)Resources.Load(cardfolder+cardID));
-        return tempCard;
+        Card card = Instantiate(Resources.Load<Card>(cardfolder+cardID));
+        return card;
     }
 
     /// <summary>
@@ -33,6 +36,11 @@ public class CardLoader : ScriptableObject
     /// <returns></returns>
     public bool exists(string cardID)
     {
+        if (cardID == "000001000002000003")
+        {
+            Debug.Log("Combo exists");
+            return true;
+        }
         return false;
     }
 }

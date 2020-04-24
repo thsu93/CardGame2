@@ -19,10 +19,7 @@ public class Equipment: MonoBehaviour
     public EquipmentHandler.EquipmentTypes type;
     public Card[] AssociatedCards; 
 
-
     private void Start() 
     {
-        AssociatedCards = null;
-        type = EquipmentHandler.EquipmentTypes.Arm;
     }
 }

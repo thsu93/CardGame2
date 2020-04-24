@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 /// Handles the logic of the game
 /// </summary>
 
+
+//TODO: Decide what should be a gameobject vs a scriptable
 public class GameManager : MonoBehaviour
 {
     //Referenced gameobjects
@@ -16,12 +18,17 @@ public class GameManager : MonoBehaviour
     public UIController UI;
     public BurnHandler burner;
     public ComboManager combo;
-    BattleManager battle;
 
     //characters in the battle.
     //TODO: will require rework if more than one enemy/player char
     public Character player;
     public Character enemy;
+
+
+    //Scriptable Objects
+    BattleManager battle;
+    CardLoader loader;
+
 
     //holders for aspects of player and enemy, derived from respective character 
     CharacterStats playerStats;
@@ -36,16 +43,18 @@ public class GameManager : MonoBehaviour
 
     //variables for game logic
     int turnCount = 1;
-
+    static int COMBOLENGTH = 3;
 
     /// <summary>
     /// initialize game.
     /// </summary>
     private void Start() 
     {
-        battle = this.gameObject.AddComponent<BattleManager>();
         playerDeck = this.gameObject.AddComponent<Deck>();
         enemyDeck = this.gameObject.AddComponent<Deck>();
+
+        battle = ScriptableObject.CreateInstance<BattleManager>();
+        loader = ScriptableObject.CreateInstance<CardLoader>();
 
         playerStats = player.stats;
         enemyStats = enemy.stats;
@@ -67,15 +76,18 @@ public class GameManager : MonoBehaviour
     /// 
     /// DESIGN Q: Additional complexity?
     /// </summary>
-    void StartGame()
+    public void StartGame()
     {
         //Current deck for both players to full decklist
         //Char stats to default values
         //fill hand to full
         for (int i = 0; i < hand.getMax(); i++)
         {
-            Card a = playerDeck.GenerateNewCard();
-            playerDeckDisplay.Deal(a);
+            string id = playerDeck.GenerateNewCard();
+
+            //does not check if card ID is bad, should re-evaluate.
+            Card card = loader.InstantiateCard(id);
+            playerDeckDisplay.Deal(card);
         }
         
         UI.SetTurn(turnCount);
@@ -128,7 +140,7 @@ public class GameManager : MonoBehaviour
         //some sort of draw manipulation func
 
         //generate an instance of the top card
-        currentPlayerCard = playerDeck.GenerateNewCard();
+        currentPlayerCard = loader.InstantiateCard(playerDeck.GenerateNewCard());
 
         setDropMode(true);
         playerDeckDisplay.setActive(false);
@@ -143,6 +155,11 @@ public class GameManager : MonoBehaviour
     /// Calculate DOTs, checks gamestate
     /// Check for any combos, calculates damage/defense values against existing player/opponent health
     /// Calculate damage (check for any status modifiers)
+    /// 
+    /// TODO: play vs burn actions
+    /// TODO: manager for DOT effects
+    /// TODO: enemy AI
+    /// 
     /// <summary>
     /// Determines how turn will proceed. Checks for combos, runs enemy AI, calculates damage values.
     /// 
@@ -151,10 +168,6 @@ public class GameManager : MonoBehaviour
     /// Combo Check,
     /// Determine Card Action,
     /// Pass to execution.
-    /// 
-    /// TODO: play vs burn
-    /// TODO: manager for DOT effects
-    /// TODO: enemy AI
     /// </summary>
     void PreExecute()
     {
@@ -166,11 +179,11 @@ public class GameManager : MonoBehaviour
         currentPlayerCard = playZone.GetCard();
 
         //pass newCard to combomanager for processing
-        combo.addToQueue(currentPlayerCard, playerDeck);
+        combo.addToQueue(currentPlayerCard);
         currentPlayerCard = combo.getAction();
 
         //AI generate enemy card
-        currentEnemyCard = enemyDeck.GenerateNewCard();
+        currentEnemyCard = loader.InstantiateCard(enemyDeck.GenerateNewCard());
 
         //TODO: placeholder, needs to deal with if burn
         currentPlayerAction = currentPlayerCard.play;
@@ -215,7 +228,11 @@ public class GameManager : MonoBehaviour
         //CARDS ARE NOT ADDED TO ENEMY'S GY
         
         //TODO: handle adding to burn vs graveyard
-        playerDeck.AddToGraveyard(currentPlayerCard);
+        if (combo.transform.childCount>=COMBOLENGTH)
+        {
+            playerDeck.AddToGraveyard(combo.getFirst()); 
+
+        }
         enemyDeck.AddToGraveyard(currentEnemyCard);
         
         GameStateCheck();
@@ -252,16 +269,20 @@ public class GameManager : MonoBehaviour
     void GameOver()
     {
         UI.GameOver();
-        turnCount = 0;
-        hand.Reset();
+        fullReset();
     }
     void GameWin()
     {
         UI.GameWin();
-        turnCount = 0;
-        hand.Reset();
+        fullReset();
     }
 
+    void fullReset()
+    {
+        turnCount = 0;
+        hand.Reset();
+        combo.Reset();
+    }
 
 
 

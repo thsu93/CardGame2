@@ -10,7 +10,7 @@ using UnityEngine;
 /// Should eventually handle status, field effects in seperate functions.
 /// </summary>
 /// 
-public class BattleManager : MonoBehaviour
+public class BattleManager : ScriptableObject
 {
     /// <summary>
     /// Given a card and stats for both a player and enemy, apply those effects to each other simultaneously

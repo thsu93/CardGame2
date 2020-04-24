@@ -31,30 +31,17 @@ public class UIBox : MonoBehaviour
         messageText.fontSize = 100;
         messageText.color = Color.red;
     }
-    
-    public void DamageDisplay(int attack, int heal, int damage)
-    {
-        titleText.text = "Turn Complete";
-        string player = "Player dealt " + attack + " damage";
-        if (heal > 0)
-        {
-            player += " and healed " + heal;
-        }
-        player += ".";
-        string enemy = "Enemy dealt " + damage + " damage.";
-        messageText.text = player + "\n" + enemy;
-    }
 
     public void DisplayMessage(string message)
     {
         messageText.text = message;
     }
 
-    // public void PressOK()
-    // {
-    //     manager.PreTurn();
-    //     Destroy(this.gameObject);
-    // }
+    public void PressOK()
+    {
+        manager.StartGame();
+        Destroy(this.gameObject);
+    }
 
 
 }   

@@ -9,45 +9,23 @@ using UnityEngine;
 /// 
 /// TODO: A lot of work needed here if to be used. Database likely needed.
 /// 
-/// </summary>
+// /// </summary>
 public class CardDict : MonoBehaviour
 {
-    Dictionary<string, GameObject> cardMap = new Dictionary<string, GameObject>();
-    Dictionary<string, GameObject> comboMap = new Dictionary<string, GameObject>();
-
-    void Awake()
-    {
-        cardMap.Add("000001", (GameObject)Resources.Load("SlashCard"));
-        cardMap.Add("000002", (GameObject)Resources.Load("StabCard"));
-        cardMap.Add("000003", (GameObject)Resources.Load("StrikeCard"));
-        cardMap.Add("000004", (GameObject)Resources.Load("AttackCard"));
-        cardMap.Add("000005", (GameObject)Resources.Load("DefendCard"));
-        cardMap.Add("000006", (GameObject)Resources.Load("SpellCard"));
-
-
-        comboMap.Add("000001000002000003", (GameObject)Resources.Load("BladeDanceCombo"));
-    }
-
-
-    public Card GetCard(string name)
-    {
-        //should not ever error
-        return cardMap[name].GetComponent<Card>();
-    }
-
-    public bool isACombo(string cardIDs)
-    {
-        return comboMap.ContainsKey(cardIDs);
-    }
-
-    public Card GetComboCard(string cardIDs)
-    {
-        if (comboMap[cardIDs] != null)
-        {
-            return comboMap[cardIDs].GetComponent<Card>();
-        }
-        else
-            return null;
-    }
-
 }
+//     public Card GetCard(string name)
+//     {
+//         return (Card)(GameObject)Resources.Load(name);
+//     }
+
+//     /// <summary>
+//     /// Checks to see if the created card string is a valid combo combination
+//     /// 
+//     /// TODO: currently directly checks against only existing card combo.
+//     /// </summary>
+//     /// <param name="cardIDs">a string of three combined cardIDs, arranged in order card 1->2->3</param>
+//     /// <returns></returns>
+//     public bool isACombo(string cardIDs)
+//     {
+//         return cardIDs == "000001000002000003";
+//     }

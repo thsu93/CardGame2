@@ -10,44 +10,39 @@ using UnityEngine;
 /// Can re-shuffle, handle Graveyard and Burn lists, and add GY to current deck
 /// 
 /// </summary>
-/// 
-/// 
-/// TODO: THIS IS NOT HOW INSTANTIATE WORKS
 public class Deck : MonoBehaviour
 {
-    //PROG Q: should likely switch to list of cardIDs that are instantiated
-    List<Card> fullDeck = new List<Card>();
-    List<Card> currentDeck = new List<Card>();
-    List<Card> burned = new List<Card>();
-    List<Card> graveyard = new List<Card>();
+    // //PROG Q: should likely switch to list of cardIDs that are instantiated
 
-    //TODO: Needs implementation of cardloader;
-    CardLoader loader;
+    List<string> fullDeck = new List<string>();
+    List<string> currentDeck = new List<string>();
+    List<string> burned = new List<string>();
+    List<string> graveyard = new List<string>();
 
     private void Start() {
-        loader = ScriptableObject.CreateInstance<CardLoader>();
     }
 
-    public void initialize(List<Card> cards)
+    public void initialize(List<string> cards)
     {
         fullDeck = cards;
         currentDeck.AddRange(fullDeck);
+        Shuffle();
     }
 
     //PROG Q: public? private? 
     /// <summary>
     /// Shuffles cards in deck.
     /// </summary>
-    public void Shuffle()
+    void Shuffle()  
     {
-        List<Card> tempDeck = new List<Card>();
-        while (currentDeck.Count>=0)
-        {
-            int cardNumber = Random.Range(0, currentDeck.Count);
-            tempDeck.Add(currentDeck[cardNumber]);
-            currentDeck.RemoveAt(cardNumber);
-        }
-        currentDeck = tempDeck;
+        int n = currentDeck.Count;
+        while (n > 1) {  
+            n--;  
+            int k = Random.Range(0, n + 1);  
+            string value = currentDeck[k];  
+            currentDeck[k] = currentDeck[n];  
+            currentDeck[n] = value;  
+        }  
     }
 
     /// <summary>
@@ -57,30 +52,30 @@ public class Deck : MonoBehaviour
     {
         //Some sort of animation call
         currentDeck.AddRange(graveyard);
-        graveyard = new List<Card>();
+        graveyard = new List<string>();
         Shuffle();
     }
 
     //PROG Q: Should these be using instantiate?
     public void AddToGraveyard(Card card)
     {
-        graveyard.Add(Instantiate(card));
+        graveyard.Add(card.cardID);
         Destroy(card.gameObject);
     }
 
     public void AddToBurn(Card card)
     {        
-        burned.Add(Instantiate(card));
+        burned.Add(card.cardID);
         Destroy(card.gameObject);
     }
 
     /// <summary>
-    /// Returns an instantiated copy of the top card in the deck.
+    /// Returns an instantiated copy of the top card in the deck. Will shuffle graveyard in if nothing in deck.
     /// 
     /// Removes that card from current deck.
     /// </summary>
-    /// <returns>a copy of the top card in the deck, or null if no cards remaining</returns>
-    public Card GenerateNewCard()
+    /// <returns>a copy of the top card in the deck, or null if no cards remaining in both deck and gy</returns>
+    public string GenerateNewCard()
     {
         if (currentDeck.Count == 0)
         {
@@ -91,12 +86,21 @@ public class Deck : MonoBehaviour
         {
             return null;
         }
-        Card temp = Instantiate(currentDeck[0]);
+        string temp = currentDeck[0];
         currentDeck.RemoveAt(0);
         return temp;
     }
 
-    //TODO: Write code to find a card given a cardID
+    public void Reset()
+    {
+        currentDeck = new List<string>();
+        currentDeck.AddRange(fullDeck);
+        Shuffle();
+        graveyard = new List<string>();
+        burned = new List<string>();
+    }
+
+    //TODO: Write code to select a card from the decklist given a cardID (controlled draw)
 
     // /// <summary>
     // /// Finds a card in the decklist given a cardID, returns a copy of it, and removes it from the current decklist
