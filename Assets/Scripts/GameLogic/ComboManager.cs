@@ -31,10 +31,16 @@ public class ComboManager : MonoBehaviour
             card.transform.SetParent(this.transform);
             currentAction = card;
         }
-        
     }
+    
 
-    public Card getAction()
+    /// <summary>
+    /// Checks if the cards in the combo queue match a combo card
+    /// 
+    /// TODO: Should this be checking if 3 cards? Or is that handled adequately already
+    /// </summary>
+    /// <returns></returns>
+    public Card checkForCombo()
     {
         Card[] cards = GetComponentsInChildren<Card>();
         string cardIDs = "";
@@ -42,7 +48,6 @@ public class ComboManager : MonoBehaviour
         {
             cardIDs += curr.cardID;
         }
-        //TODO: FIX THIS
         if (loader.exists(cardIDs))
         {
             Debug.Log("Combo");

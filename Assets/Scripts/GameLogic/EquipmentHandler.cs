@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//To Do:
-//Decide what to do with this
+//TODO:
+//Decide what to do with this code
 
 public class EquipmentHandler : MonoBehaviour
 {

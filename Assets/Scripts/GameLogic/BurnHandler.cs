@@ -2,40 +2,54 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO: ddetermine if this needs to be separate from playhandler
+//Probably, because it should do different things in the end? But should consider.
+
 public class BurnHandler : MonoBehaviour
 {
     DropZone burnZone;
-    GameManager manager;
-    public Character associatedCharacter;
+    Card newCard = null;
+    public bool hasCard = false;
+
     // Start is called before the first frame update
     void Awake()
     {
         burnZone = this.GetComponent<DropZone>();
-        GameObject ManagerHolder = GameObject.Find("GameManager");
-        manager = ManagerHolder.GetComponent<GameManager>();
     }
 
-    // // Update is called once per frame
-    // void Update()
-    // {
-    //     //finds draggables, executes Burn, then deletes them. 
-    //     Card d = this.GetComponentInChildren<Card>();
-    //     if (d != null)
-    //     {
-    //         Burn(d);
-    //     }
-    // }
+    private void Update() 
+    {
+        hasCard = (this.transform.childCount > 0);
+        if (hasCard)
+        {
+            CheckForNewCards();
+        }
+    }
 
-    // void Burn(Card card)
-    // {
-    //     associatedCharacter.charDeck.AddToBurn(card);
-    //     manager.ExecuteTurn(card.burnEffect);
-    //     //call gamemanager with card to burn, then destroy card;
-    //     Destroy(card.gameObject);
-    // }
+    //check for if a card has been dropped into the queue
+    void CheckForNewCards()
+    {
+        for (int i = this.transform.childCount-1; i>=0; i--)
+        {
+            Card tempCard = this.transform.GetChild(i).GetComponent<Card>();
+            if (tempCard != null)
+            {
+                newCard = tempCard;
+            }
+        }
+    }
 
+    /// <summary>
+    /// Set dropzone on or off. 
+    /// </summary>
+    /// <param name="active">True for on</param>
     public void setMode(bool active)
     {
         burnZone.droppable=active;
+    }
+
+    public Card GetCard()
+    {
+        return newCard;
     }
 }

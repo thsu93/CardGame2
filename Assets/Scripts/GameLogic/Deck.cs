@@ -57,12 +57,22 @@ public class Deck : MonoBehaviour
     }
 
     //PROG Q: Should these be using instantiate?
+
+    /// <summary>
+    /// Given a card, will add it's card ID to the list of graveyard cards
+    /// </summary>
+    /// <param name="card"></param>
     public void AddToGraveyard(Card card)
     {
         graveyard.Add(card.cardID);
         Destroy(card.gameObject);
     }
 
+
+    /// <summary>
+    /// Given a card, will add it's card ID to the list of burned cards
+    /// </summary>
+    /// <param name="card"></param>
     public void AddToBurn(Card card)
     {        
         burned.Add(card.cardID);
@@ -81,11 +91,15 @@ public class Deck : MonoBehaviour
         {
             GYReshuffle();
         }
+
         //check if post-shuffle count remains 0
+        //DESIGN Q: What should game do in this case?
         if (currentDeck.Count == 0)
         {
             return null;
         }
+
+
         string temp = currentDeck[0];
         currentDeck.RemoveAt(0);
         return temp;

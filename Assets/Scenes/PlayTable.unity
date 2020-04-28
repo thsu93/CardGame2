@@ -367,6 +367,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -594,7 +595,7 @@ MonoBehaviour:
   hand: {fileID: 1740863913775811473}
   playerDeckDisplay: {fileID: 690526974}
   UI: {fileID: 759253054}
-  burner: {fileID: 1867779742}
+  burnZone: {fileID: 1867779742}
   combo: {fileID: 1207514145}
   player: {fileID: 1112952259}
   enemy: {fileID: 1923660110}

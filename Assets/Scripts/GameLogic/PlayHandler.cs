@@ -32,10 +32,10 @@ public class PlayHandler : MonoBehaviour
 
     private void Update() 
     {
-        if (this.transform.childCount > 0)
+        hasCard = (this.transform.childCount > 0);
+        if (hasCard)
         {
             CheckForNewCards();
-            hasCard = true;
         }
     }
 
@@ -54,6 +54,7 @@ public class PlayHandler : MonoBehaviour
             if (tempCard != null)
             {
                 // Old, when was using queue icons.
+                // Saving old code for potential reference/use later
                 // QueueCard NewQueue = Instantiate(tempCard.matchingQueueCard);
                 // NewQueue.transform.SetParent(this.transform);
                 // NewQueue.transform.SetAsFirstSibling();
@@ -65,7 +66,6 @@ public class PlayHandler : MonoBehaviour
 
     public Card GetCard()
     {
-        hasCard = false;
         return newCard;
     }
 }

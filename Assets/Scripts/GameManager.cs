@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public HandHandler hand;
     public DeckDisplay playerDeckDisplay;
     public UIController UI;
-    public BurnHandler burner;
+    public BurnHandler burnZone;
     public ComboManager combo;
 
     //characters in the battle.
@@ -24,11 +24,9 @@ public class GameManager : MonoBehaviour
     public Character player;
     public Character enemy;
 
-
     //Scriptable Objects
     BattleManager battle;
     CardLoader loader;
-
 
     //holders for aspects of player and enemy, derived from respective character 
     CharacterStats playerStats;
@@ -44,6 +42,9 @@ public class GameManager : MonoBehaviour
     //variables for game logic
     int turnCount = 1;
     static int COMBOLENGTH = 3;
+
+    //TODO: Any way to improve this?
+    bool burned = false;
 
     /// <summary>
     /// initialize game.
@@ -97,20 +98,33 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks every frame if drop zone has a card object
+    /// Checks every frame if either drop zone has a card object
+    /// 
+    /// If it does, locks player input, runs turn.
     /// </summary>
     private void Update() {
 
-        //if playzone has a card, execute turn loop
+        //if a playzone has a card, execute turn loop
+        //distinguish which zone has the card
+
         if (playZone.hasCard)
         {
+            setDropMode(false);
+            burned = false;
             PreExecute();
             ExecuteTurn();
             CleanUp();
         }
 
+        if (burnZone.hasCard)
+        {
+            setDropMode(false);
+            burned = true;
+            PreExecute();
+            ExecuteTurn();
+            CleanUp();
+        }
     }
-
 
     ///
     /// TURN LOOP:
@@ -121,7 +135,7 @@ public class GameManager : MonoBehaviour
     /// EXECUTE
     /// CLEAN-UP
     /// 
-    /// 
+
     /// 
     // DRAW
     // Check for any draw/action manipulation
@@ -173,23 +187,31 @@ public class GameManager : MonoBehaviour
     {
         //DOTs take effect
         GameStateCheck();
+
+        if (!burned)
+        {
+            //take the card effect and set to current card effect
+            currentPlayerCard = playZone.GetCard();
+
+            //pass newCard to combomanager for processing
+            combo.addToQueue(currentPlayerCard);
+            currentPlayerCard = combo.checkForCombo();
+            
+            currentPlayerAction = currentPlayerCard.play;
+        }
         
+        if (burned)
+        {
+            currentPlayerCard = burnZone.GetCard();
 
-        //take the card effect and set to current card effect
-        currentPlayerCard = playZone.GetCard();
+            //TEMPWORKAROUND
+            currentPlayerCard.transform.SetParent(this.transform);
 
-        //pass newCard to combomanager for processing
-        combo.addToQueue(currentPlayerCard);
-        currentPlayerCard = combo.getAction();
+            currentPlayerAction = currentPlayerCard.burn;
+        }
 
         //AI generate enemy card
         currentEnemyCard = loader.InstantiateCard(enemyDeck.GenerateNewCard());
-
-        //TODO: placeholder, needs to deal with if burn
-        currentPlayerAction = currentPlayerCard.play;
-
-        //add card to GY or burn;
-        // isActive = false;
 
         //Set enemy AI card to card action. Currently just always using play effect
     }
@@ -227,19 +249,26 @@ public class GameManager : MonoBehaviour
         //TODO: CURRENT ERROR: ENEMY DOES NOT REGEN CARDS
         //CARDS ARE NOT ADDED TO ENEMY'S GY
         
-        //TODO: handle adding to burn vs graveyard
-        if (combo.transform.childCount>=COMBOLENGTH)
+        if (!burned)
         {
-            playerDeck.AddToGraveyard(combo.getFirst()); 
-
+            //TODO: handle adding to burn vs graveyard
+            if (combo.transform.childCount>=COMBOLENGTH)
+            {
+                playerDeck.AddToGraveyard(combo.getFirst()); 
+            }
         }
+
+        if (burned)
+        {
+            playerDeck.AddToBurn(currentPlayerCard);
+        }
+
+        //TODO: Add enemy AI functionality here as well
         enemyDeck.AddToGraveyard(currentEnemyCard);
-        
         GameStateCheck();
 
         //Re-activate draw button, turn off drop zones.
         playerDeckDisplay.setActive(true);
-        setDropMode(false);
 
         //Update turn counter.
         turnCount++;
@@ -251,7 +280,7 @@ public class GameManager : MonoBehaviour
     // If a char health is = 0, character dies
     // Check for game over/win states given char health
     /// <summary>
-    /// Checks if a character has died. Player death evaluated first.
+    /// Checks if a character has died. Player death evaluated at higher priority.
     /// 
     /// TODO: Will eventually add more complexity to win/loss states
     /// </summary>
@@ -309,7 +338,7 @@ public class GameManager : MonoBehaviour
     void setDropMode(bool on)
     {
         playZone.setMode(on);   
-        burner.setMode(on);
+        burnZone.setMode(on);
     }
 
 }
