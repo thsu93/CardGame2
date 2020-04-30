@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 /// </summary>
 
 
-//TODO: Decide what should be a gameobject vs a scriptable
+//TODO: The gamemanager should be managing scene transitions and such, not the combat engine.  
 public class GameManager : MonoBehaviour
 {
     //Referenced gameobjects
@@ -105,7 +105,7 @@ public class GameManager : MonoBehaviour
     private void Update() {
 
         //if a playzone has a card, execute turn loop
-        //distinguish which zone has the card
+        //distinguish which zone has the
 
         if (playZone.hasCard)
         {

@@ -194,7 +194,7 @@ PrefabInstance:
     - target: {fileID: 7702672290236410574, guid: a1786570a2dff73438fcd1bf4a570d0d,
         type: 3}
       propertyPath: defenseVal
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7702672290236410574, guid: a1786570a2dff73438fcd1bf4a570d0d,
         type: 3}
