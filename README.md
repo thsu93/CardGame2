@@ -1,4 +1,4 @@
-# Game-2.0
+# Card Game Engine Prototype
 
 Unity-based Card Engine for Dragging and Dropping.
 
