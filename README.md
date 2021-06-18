@@ -1,4 +1,4 @@
-"# Game-2.0" 
+# Game-2.0
 
 Unity-based Card Engine for Dragging and Dropping.
 
